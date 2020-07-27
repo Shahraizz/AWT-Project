@@ -1,14 +1,12 @@
 const express = require('express');
-const bodyParser = require("body-parser");
-const Joi = require('joi');
 const db = require("../connection");
-const _ = require('lodash');
+const _ = require("lodash");
+const Joi = require('joi');
 const util = require('util');
 
 const route = express.Router();
-route.use(bodyParser.json());
 
-route.get('/',(req,res)=>{
+route.get('/createOrder',(req,res)=>{
     db.query("SELECT * FROM customer", (error,result) => {
         if (error){
             console.log("error in query" + error.stack);
@@ -18,31 +16,29 @@ route.get('/',(req,res)=>{
     });
 });
 
-route.post('/',(req,res)=>{
+route.post('/createOrder',(req,res)=>{
 
     //var {error , value} = validateOrder(req.body);
     //if (error) return res.status(400).send(error.details[0].message);
 
     //Calculating the total price of entire cart
-    var prevorderid;
     var total = 0
     for (t of req.body) {
         total += Number(t.total);
     }
     // SQL queries for mass insertion 
-    let sql0 = "INSERT INTO `orders` ( `cust_id`, `balance`, `total`, `date`) VALUES ?";
+    let sql0 = "INSERT INTO `orders` ( `cust_id`, `balance`, `total`) VALUES ?";
     let sql1 = "INSERT INTO `purchases`(`product_id`, `order_id`, `quantity`) VALUES ?";
     
-    let todos = req.body
+    let todos = req.body;
     var orderInsertion=[]; 
     var purchasesInsertion =[];
-    //  var order_id; - not using 
-    for (o of todos) { orderInsertion = [[o.cid, total, total, '2020/5/25']]; }; // Add new entry to order table //remove hardcoded date if db timestamp is enabled
-  
+
+    orderInsertion = [[req.body[0].cid, total, total]]; // Add new entry to order table
     // calling the function
     orderss(sql0,[orderInsertion],function(orderid){ // takes orderid
         for (o of todos) {
-            purchasesInsertion = [[o.id, orderid, o.count]]; 
+            purchasesInsertion.push([o.id, orderid, o.count]);
         };
         db.query(sql1, [purchasesInsertion],(error,result)=>{
         if(error){
@@ -52,7 +48,6 @@ route.post('/',(req,res)=>{
             return res.status(400).send(String(error.errno));
         }
         });
-        prevorderid = orderid;
     });
 
       // Funtion to add order with a callback - that allows us to add purchase 
@@ -72,8 +67,7 @@ route.post('/',(req,res)=>{
   //  Update the stock value for the relevant product from the selected warehouse
 
   for (o of todos) {
-    //   "UPDATE product SET "+o.wid+" = "+o.wid+"-"+o.count+" WHERE pid = "+o.id+"";
-    var sql3 = "UPDATE `product` SET "+o.wid+"= IF(("+o.wid+"-"+o.count+")>=0, "+o.wid+"-"+o.count+", "+o.wid+"='error' ) WHERE `pid`="+o.id+"";
+    var sql3 = "UPDATE product SET "+o.wid+" = "+o.wid+"-"+o.count+" WHERE pid = "+o.id+"";
     db.query(sql3, (error,result)=>{
         if(error){
             //console.log("Error while adding new purchase", error.stack);
@@ -88,15 +82,14 @@ route.post('/',(req,res)=>{
     console.log("order post received");
     var response = {
         status  : 200,
-        success : 'New added!',
-        order_id: prevorderid
+        success : 'New added!'
     }
     res.end(JSON.stringify(response));
     //return res.status(200);
     
 });
 
-route.get('/:id/newOrder',async (req,res)=>{
+route.get('/createOrder/:id/new',async (req,res)=>{
     const query = util.promisify(db.query).bind(db);
     let sql2 = "SELECT name FROM customer where cid = ?";
     let sql1 = "SELECT * FROM product";
@@ -114,25 +107,78 @@ route.get('/:id/newOrder',async (req,res)=>{
         console.log(err.stack);
         cust_name="";
     }
-    res.render('Orders/newOrder',{
+    res.render('Orders/new',{
         customer_id:req.params.id,
         customer:cust_name[0].name,
         products: products
     });
 });
 
+route.delete('/:id',(req,res) =>{
+    db.query('DELETE from orders where oid = ?',req.params.id,(err,result)=>{
+        if(err){
+            console.log(err.sqlMessage);
+            return res.status(400).send("Can't delete Order");
+        }
+        console.log('Order deleted');
+        console.log('deleted ' + result.affectedRows + ' rows');
+        return res.send("Record deleted successfully");
+    });
+});
 
-function validateOrder(data){
-    const schema = {
-        count : Joi.number().max(99999).required(),
-        id : Joi.number().max(99999).required(),
-        name : Joi.string().max(30).required(),
-        price : Joi.string().max(99999).required(),
-        total : Joi.number().max(99999).required(),
-	    wid : Joi.number().max(99999).required(),
-        cid : Joi.number().max(99999).required()
+
+route.get('/:oid/invoice',async (req,res)=>{
+    const query = util.promisify(db.query).bind(db);
+    var sql1 = 'Select purchases.order_id, purchases.quantity, product.name, product.price '+
+                ' from purchases join product on purchases.product_id = product.pid where order_id = ?';
+    var sql2 = 'Select orders.oid, orders.total, customer.name, orders.date, customer.contact'+ 
+                ' from orders join customer on orders.cust_id = customer.cid where oid = ?';
+    var purchase,order;
+    try{
+        purchase = await query(sql1,req.params.oid);
+        order = await query(sql2,req.params.oid);
+        var date = order[0].date.split(' ')[0].split('-');
+        date = new Date(date[0], date[1] - 1, date[2]); 
+        order[0].date = date.toDateString();
+        return res.render('Invoice/invoice',{
+            data:
+            {
+                products: purchase,
+                order: order[0]
+            }
+        });
+    } catch (error){
+        res.status(400).send("Can't Fetch the data, Please try again later");
     }
-    return Joi.validate(data,schema);
-}
+    
+});
+
+route.get('/',(req,res)=>{
+    var sql = 'Select orders.oid, orders.balance, orders.total, customer.name'+
+                ' from orders join customer on orders.cust_id = customer.cid';
+    db.query(sql,(err,result)=>{
+        if(err) return res.status(400).send("Can't Fetch the data, Please try again later");
+        res.send(result);
+    });
+});
+
+route.get('/:oid/tbalance',(req,res)=>{
+    var sql = 'select sum(orders.balance) as total_balance from orders where oid = ?';
+    db.query(sql,req.params.oid,(err,result)=>{
+        if(err) return res.status(400).send("Can't Fetch the data, Please try again later");
+        res.send(result);
+    });
+});
+
+route.put('/',(req,res)=>{
+    var amount = Number(req.body.amount);
+    var balance = Number(req.body.balance);
+    if((balance-amount)<0) return res.status(400).send("Debit amount must be less than Balance");
+    var sql = 'update orders set balance = '+(balance-amount)+' where oid = ?';
+    db.query(sql,req.body.oid,(error,result)=>{
+        if(error) return res.status(400).send("Can't update Account. Please try again later");
+        res.send(String(balance-amount));
+    });
+});
 
 module.exports = route;

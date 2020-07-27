@@ -67,13 +67,14 @@ route.put('/',(req,res)=>{
 route.get('/:id/orders',async (req,res)=>{
 
     const query = util.promisify(db.query).bind(db);
-    let sql1 = "SELECT * FROM orders where cust_id = ? order by date";
+  let sql1 = "SELECT sum(orders.balance) as total_balance ,orders.* FROM orders where cust_id = ? order by date";
+    //let sql1 = "SELECT * FROM orders where cust_id = ? order by date";
     let sql2 = "SELECT name FROM customer where cid = ?";
     var orders,cust_name;
     try{
         orders = await query(sql1,req.params.id);
         cust_name = await query(sql2,req.params.id);
-
+/*
         for (o of orders){
             var date = o.date.split(' ')[0].split('-');
             date = new Date(date[0], date[1] - 1, date[2]); 
@@ -83,13 +84,21 @@ route.get('/:id/orders',async (req,res)=>{
         res.render('Customers/orders',{
             orders:orders,
             customer:cust_name[0].name
-        });
+        });*/
+        res.send(orders);
     } catch(err){
         console.log(err.stack);
         return res.status(400).send("can't load orders");
     }
 });
 
+route.get('/:oid/tbalance',(req,res)=>{
+    var sql = 'select sum(orders.balance) as total_balance from orders where oid = ?';
+    db.query(sql,req.params.oid,(err,result)=>{
+        if(err) return res.status(400).send("Can't Fetch the data, Please try again later");
+        res.send(result);
+    });
+});
 
 
 function validateCustomer(data){

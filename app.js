@@ -30,7 +30,7 @@ app.use('/stock',auth,products);
 app.use('/customers',auth,customer);
 app.use('/register',register);
 app.use('/login',login);
-app.use('/orders',auth,orders);
+app.use('/orders',orders);
 
 app.set('views', path.join(__dirname + '/views'));
 app.set('view engine','ejs');
