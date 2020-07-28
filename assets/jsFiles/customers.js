@@ -42,7 +42,7 @@ $(document).ready(()=>{
                 console.log("Customer Deleted sucessfully");
             },
             error: function(){
-                console.log("Error in deleting Customer");
+                alert("Error in deleting Customer");
             }
         });
     });
