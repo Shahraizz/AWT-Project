@@ -28,10 +28,11 @@
 			<div class="table-title">
 				<div class="row">
 					<div class="col-sm-6">
-						<h2>Orders of <b><%=customer%> </b></h2>
+						<h2>Orders of <b><%=customer.name%> </b></h2>
 					</div>
 					<div class="col-sm-6">
-						<a href="" class="btn btn-success addorder" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New order</span></a>						
+						<a href="/orders/createOrder/<%=customer.id%>/new" class="btn btn-success addorder"><i class="material-icons">&#xE147;</i> <span>Add New order</span></a>
+						<a href="" data-b="<%=customer.id%>" class="btn btn-info checkBalance" data-toggle="modal"><i class="material-icons"></i> <span>Total Balance</span></a>						
 					</div>
 				</div>
 			</div>
@@ -88,6 +89,30 @@
 		</div>
 	</div>
 </div>
+
+<!-- Total balance modal Modal HTML -->
+<div id="totalBalanceModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="totalBalanceForm" action="#">
+				<div class="modal-header">						
+					<h4 class="modal-title">Total Balance</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label>Amount</label>
+						<input id="totalBalanceField" type="number" class="form-control" name="" data-balance="" disabled>
+					</div>		
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
 <!-- Delete Modal HTML -->
 <div id="deleteOrderModal" class="modal fade">
 	<div class="modal-dialog">

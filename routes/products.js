@@ -97,6 +97,16 @@ route.put('/:id',(req,res)=>{
     });
 });
 
+route.get('/required',(req, res) => {
+    var sql = 'Select * from product where w1 < 0 or w2 < 0 or w3 < 0 or w4 < 0';
+    db.query(sql,(err,result)=>{
+        if(err) return res.status(400).send("Can not load the data. please try again later");
+        res.render('Products/required',{
+            products : result
+        });
+    })
+});
+
 function validateStock(data){
     const schema = {
         w1 : Joi.number().max(99999),
@@ -111,7 +121,7 @@ function validateProduct(data){
     const schema = {
         name : Joi.string().max(30).required(),
         description : Joi.string().max(30).allow(''),
-        price : Joi.number().max(99999).required()
+        price : Joi.number().max(99999).min(0).required()
     }
     return Joi.validate(data,schema);
 }

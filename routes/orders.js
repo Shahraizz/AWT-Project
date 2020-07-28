@@ -162,13 +162,14 @@ route.get('/',(req,res)=>{
     });
 });
 
+/*
 route.get('/:oid/tbalance',(req,res)=>{
     var sql = 'select sum(orders.balance) as total_balance from orders where oid = ?';
     db.query(sql,req.params.oid,(err,result)=>{
         if(err) return res.status(400).send("Can't Fetch the data, Please try again later");
         res.send(result);
     });
-});
+});*/
 
 route.put('/',(req,res)=>{
     var amount = Number(req.body.amount);
@@ -178,6 +179,17 @@ route.put('/',(req,res)=>{
     db.query(sql,req.body.oid,(error,result)=>{
         if(error) return res.status(400).send("Can't update Account. Please try again later");
         res.send(String(balance-amount));
+    });
+});
+
+route.get('/defaulters',(req,res)=>{
+    var sql = 'Select sum(orders.balance) as balance, customer.name, customer.cid from orders join customer'+
+                ' on orders.cust_id=customer.cid  where balance > customer.credit_limit group by orders.cust_id,customer.cid';
+    db.query(sql,(err,result)=>{
+        if (err) return res.status(400).send('error in query');
+        res.render('Customers/defaulters',{
+            defaulters: result
+        });
     });
 });
 
