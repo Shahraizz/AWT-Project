@@ -74,7 +74,8 @@ $(document).ready(()=>{
                     '<tr>' +
 						'<td>'+Customer.cid+'</td>'+
 						'<td>'+Customer.name+'</td>'+
-						'<td>'+Customer.contact+'</td>'+
+                        '<td>'+Customer.contact+'</td>'+
+                        '<td>'+Customer.credit_limit+'</td>'+
                         '<td>'+
                             '<a href="/orders/<%=order.oid%>/invoice" target="_blank" class="addOrder" data-cid='+Customer.cid+'><i class="material-icons" data-toggle="tooltip" title="Orders">dvr</i></a>'+
 							'<a href="" class="edit" data-toggle="modal" data-cid='+Customer.cid+'><i class="material-icons" data-toggle="tooltip" title="Edit">edit</i></a>'+
@@ -99,6 +100,7 @@ $(document).ready(()=>{
         $('#editCustomerID').attr('value',$(this).parents("tr").find("td:eq(0)").text());
         $('#editCustomername').attr('value',$(this).parents("tr").find("td:eq(1)").text());
         $('#editCustomercontact').attr('value',$(this).parents("tr").find("td:eq(2)").text());
+        $('#editCustomerCredit_limit').attr('value',$(this).parents("tr").find("td:eq(3)").text());
 
         edit_row = $(this).parents('tr');
         $('#editCustomerModal').modal('show');
@@ -125,7 +127,8 @@ $(document).ready(()=>{
                 edit_row.html(
 						'<td>'+Customer.cid+'</td>'+
 						'<td>'+Customer.name+'</td>'+
-						'<td>'+Customer.contact+'</td>'+
+                        '<td>'+Customer.contact+'</td>'+
+                        '<td>'+Customer.credit_limit+'</td>'+
                         '<td>'+
                             '<a href="/orders/<%=order.oid%>/invoice" target="_blank" class="addOrder" data-cid='+Customer.cid+'><i class="material-icons" data-toggle="tooltip" title="Orders">dvr</i></a>'+
 							'<a href="" class="edit" data-toggle="modal" data-cid='+Customer.cid+'><i class="material-icons" data-toggle="tooltip" title="Edit">edit</i></a>'+
