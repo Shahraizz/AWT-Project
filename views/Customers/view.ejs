@@ -41,6 +41,7 @@
 						<th>ID</th>
 						<th>Name</th>
 						<th>Contact</th>
+						<th>Credit limit</th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -50,6 +51,7 @@
 							<td><%=customer.cid%></td>
 							<td><%=customer.name%></td>
 							<td><%=customer.contact%></td>
+							<td><%=customer.credit_limit%></td>
 							<td>
 								<a href="customers/<%=customer.cid%>/orders" class="viewOrders" data-cid= "<%=customer.cid%>" ><i class="material-icons" data-toggle="tooltip" title="Orders">dvr</i></a>
 								<a href="" class="edit" data-cid= "<%=customer.cid%>" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">edit</i></a>
@@ -113,6 +115,10 @@
 						<label>Contact</label>
 						<input id="editCustomercontact" type="text" class="form-control" name="contact"></input>
 				
+					</div>
+					<div class="form-group">
+						<label>Credit limit</label>
+						<input id="editCustomerCredit_limit" type="number" class="form-control" name="credit_limit"></input>
 					</div>				
 				</div>
 				<div class="modal-footer">

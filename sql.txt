@@ -15,13 +15,13 @@ PRIMARY KEY (`pid`)
 ) ENGINE = InnoDB;
 
 INSERT INTO `product` (`pid`, `name`, `price`, `w1`, `w2`, `w3`, `w4`) VALUES 
-('1', 'American Dairy', '20', '50','50','50','50'),
+('1', 'American Dairy', '20', '0','0','0','-1'),
 ('2', 'Atta Saresh', '65', '50','50','50','50'),
-('3', 'Apple jam curl', '20', '50','50','50','50'),
-('4', 'Afza Excellent', '20', '50','50','50','50'),
-('5', 'Anise No:-1', '2300', '50','50','54','50'),
+('3', 'Apple jam curl', '20', '50','0','0','0'),
+('4', 'Afza Excellent', '20', '50','0','50','50'),
+('5', 'Anise No:-1', '2300', '0','50','54','50'),
 ('6', 'Apple 6004', '300', '50','50','50','50'),
-('7', 'Almond No:-1', '345', '50','50','50','50');
+('7', 'Almond No:-1', '345', '50','0','50','0');
 
 
 CREATE TABLE `user` ( 
@@ -57,15 +57,6 @@ CREATE TABLE `orders` (
 PRIMARY KEY (`oid`)
 ) ENGINE = InnoDB;
 
-/*
-INSERT INTO `orders` (`cust_id`, `balance`, `total`, `date`) VALUES 
-( 1, 500, 1000,'2020-07-01'),
-( 1, 2304, 4329, '2020-07-02'),
-( 1, 3090, 5000, '2020-07-04'),
-( 2, 500, 1000, '2020-07-06'),
-( 2, 500, 6500, '2020-07-02'),
-( 2, 5050, 7000, '2020-07-01');
-*/
 
 CREATE TABLE `purchases` (
 `purchase_id` INT NOT NULL AUTO_INCREMENT,

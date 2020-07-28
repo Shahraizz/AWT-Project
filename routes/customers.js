@@ -46,7 +46,7 @@ route.delete('/:id',(req,res)=>{
 
 route.put('/',(req,res)=>{
     //Validating the request
-    var data = _.pick(req.body,['name','contact']);
+    var data = _.pick(req.body,['name','contact','credit_limit']);
     var {error , value} = validateCustomer(data);
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -55,7 +55,7 @@ route.put('/',(req,res)=>{
         if (error){
             console.log(error.sqlMessage);
             return res.status(400).send(String(error.errno));
-        } 
+        }
         console.log("Sucessfuly updated customer");
         res.send(req.body);
     });
@@ -100,7 +100,8 @@ route.get('/:oid/totalbalance',(req,res)=>{
 function validateCustomer(data){
     const schema = {
         name : Joi.string().max(30).required(),
-        contact : Joi.string().max(30)
+        contact : Joi.string().max(30),
+        credit_limit : Joi.number().max(99999999).min(0)
     }
     return Joi.validate(data,schema);
 }
