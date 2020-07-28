@@ -20,7 +20,7 @@ $(document).ready(()=>{
                 console.log("Order Deleted sucessfully");
             },
             error: function(){
-                console.log("Error in deleting Order");
+                alert("Error in deleting Order");
             }
         });
     });
@@ -54,6 +54,22 @@ $(document).ready(()=>{
                 $('#addAmountModal').modal('hide');
                 console.log("Account updated sucessfully");
                 temp.html(balance);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                   alert(xhr.responseText);
+            }
+        });
+    });
+
+    // Total Balance
+    $(document).on('click','.checkBalance',function(){
+        var id = $(this).attr('data-b');
+        $.ajax({
+            type: "GET",
+            url: 'http://localhost:3000/customers/'+id+'/totalbalance',
+            success: function(balance){
+                $('#totalBalanceField').attr('value',balance);
+                $('#totalBalanceModal').modal('show');
             },
             error: function (xhr, ajaxOptions, thrownError) {
                    alert(xhr.responseText);

@@ -5,7 +5,7 @@ USE `inventory`;
 CREATE TABLE `product` ( 
 `pid` INT NOT NULL AUTO_INCREMENT, 
 `name` VARCHAR(30) NOT NULL UNIQUE, 
-`description` VARCHAR(30) NULL , 
+`description` VARCHAR(30) NULL DEFAULT " ", 
 `price` INT(8) NOT NULL DEFAULT '0' , 
 `w1` INT(5) NOT NULL DEFAULT '0' , 
 `w2` INT(5) NOT NULL DEFAULT '0' , 
@@ -31,11 +31,12 @@ PRIMARY KEY (`username`)
 ) ENGINE = InnoDB;
 
 INSERT INTO `user` (`username`, `password`) VALUES 
-('admin', '$2b$10$2n0jxazbpWqetE6HpJNWY.vbs5nZi.Nvj2x12nNzBhtKvBx.J9uDW');
+('admin', '$2b$10$qMZcfcnK6xFFK/TFzRFSI.Hj5S88yjb/1HBLUe22r8J8v5rO7Brlm');
 
 CREATE TABLE `customer` ( 
 `cid` INT NOT NULL AUTO_INCREMENT, 
-`name` VARCHAR(30) NOT NULL UNIQUE, 
+`name` VARCHAR(30) NOT NULL UNIQUE,
+`credit_limit` int(8) NULL default "10000", 
 `contact` VARCHAR(30) NULL , PRIMARY KEY (`cid`)
 ) ENGINE = InnoDB;
 
@@ -75,10 +76,12 @@ PRIMARY KEY (`purchase_id`)
 ) ENGINE = InnoDB;
 
 ALTER TABLE `orders`
-ADD FOREIGN KEY (`cust_id`) REFERENCES customer(`cid`);
+ADD FOREIGN KEY (`cust_id`) REFERENCES customer(`cid`) 
+ON DELETE CASCADE;
 
 ALTER TABLE `purchases`
-ADD FOREIGN KEY (`product_id`) REFERENCES product(`pid`);
+ADD FOREIGN KEY (`product_id`) REFERENCES product(`pid`) 
+ON DELETE CASCADE;
 
 ALTER TABLE `purchases`
 ADD FOREIGN KEY (`order_id`) REFERENCES orders(`oid`) 

@@ -5,7 +5,8 @@ const path = require("path");
 const db = require("./connection");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
-// const morgon = require('morgan');
+
+global.redirectLink = "http://localhost:3000/home";
 
 const customer = require("./routes/customers");
 const products = require("./routes/products");
@@ -28,9 +29,9 @@ app.use(cookieParser());
 
 app.use('/stock',auth,products);
 app.use('/customers',auth,customer);
-app.use('/register',register);
+//app.use('/register',register);
 app.use('/login',login);
-app.use('/orders',orders);
+app.use('/orders',auth,orders);
 
 app.set('views', path.join(__dirname + '/views'));
 app.set('view engine','ejs');
